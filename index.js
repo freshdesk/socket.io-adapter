@@ -144,19 +144,18 @@ Adapter.prototype.broadcastId = function(packet, opts){
 
   packet.nsp = this.nsp.name;
   this.encoder.encode(packet, function(encodedPackets) {
-    if (rooms.length) {
-      for (var i = 0; i < rooms.length; i++) {
-        var room = self.rooms[rooms[i]];  
-        if (!room) continue;
+    if(self.rooms){
+      var room = self.rooms[packet.custom_room];
+      if(room){
         if((room.indexOf(packet.custom_socket_id)) && (!ids[packet.custom_socket_id]) ){
           socket = self.nsp.connected[packet.custom_socket_id];
           if (socket) {
             socket.packet(encodedPackets, true, flags.volatile);
-            ids[packet.custom_socket_id] = true;
           }
         }
       }
-    } else {
+    }
+    else {
       if(self.sids.indexOf(packet.custom_socket_id)){
         socket = self.nsp.connected[packet.custom_socket_id];
         if (socket) socket.packet(encodedPackets, true, flags.volatile);
