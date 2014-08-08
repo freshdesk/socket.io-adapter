@@ -156,6 +156,7 @@ Adapter.prototype.broadcastId = function(packet, opts){
       }
     }
     else {
+      console.log('No room exists - checking the ids individually');
       if(self.sids.indexOf(packet.custom_socket_id)){
         socket = self.nsp.connected[packet.custom_socket_id];
         if (socket) socket.packet(encodedPackets, true, flags.volatile);
