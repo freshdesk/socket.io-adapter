@@ -135,10 +135,7 @@ Adapter.prototype.broadcast = function(packet, opts){
 };
 
 Adapter.prototype.broadcastId = function(packet, opts){
-  var rooms = opts.rooms || [];
-  var except = opts.except || [];
   var flags = opts.flags || {};
-  var ids = {};
   var self = this;
   var socket;
 
@@ -147,7 +144,7 @@ Adapter.prototype.broadcastId = function(packet, opts){
     if(self.rooms){
       var room = self.rooms[packet.custom_room];
       if(room){
-        if((room.indexOf(packet.custom_socket_id)) && (!ids[packet.custom_socket_id]) ){
+        if(room.indexOf(packet.custom_socket_id)){
           socket = self.nsp.connected[packet.custom_socket_id];
           if (socket) {
             socket.packet(encodedPackets, true, flags.volatile);
