@@ -50,6 +50,24 @@ Adapter.prototype.add = function(id, room, fn){
 };
 
 /**
+ * Adds a socket to many rooms
+ *
+ * @param {String} socket id
+ * @param {array} room names
+ * @param {Function} Merge function
+ * @param {Function} callback
+ * 
+ */
+
+Adapter.prototype.addAll = function(id, rooms, merge_fn, fn){
+  this.sids[id] = this.sids[id] || {};
+  merge_fn(id, this.sids[id], this.rooms, rooms)
+  // console.log("Rooms in adaptrer: ", this.rooms);
+  // console.log("Updated in SIDs?", this.sids[id]);
+  if (fn) process.nextTick(fn.bind(null, null));
+};
+
+/**
  * Removes a socket from a room.
  *
  * @param {String} socket id
