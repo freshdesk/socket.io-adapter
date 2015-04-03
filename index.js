@@ -97,7 +97,7 @@ Adapter.prototype.delAll = function(id, fn){
     for (var room in rooms) {
       if (rooms.hasOwnProperty(room)) {
         delete this.rooms[room][id];
-        if (this.rooms[room].length <= 0){
+        if (Object.keys(this.rooms[room]).length <= 0){
           delete this.rooms[room];
         }
       }
