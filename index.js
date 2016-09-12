@@ -148,6 +148,47 @@ Adapter.prototype.broadcast = function(packet, opts){
 };
 
 /**
+ * Broadcasts a packet to a specific socket
+ *
+ * Options:
+ *  - `flags` {Object} flags for this packet
+ *  - `except` {Array} sids that should be excluded
+ *  - `rooms` {Array} list of rooms to broadcast to
+ *
+ * @param {Object} packet object
+ * @api public
+ */
+Adapter.prototype.broadcastId = function(packet, opts){
+  var rooms = opts.rooms || [];
+  var except = opts.except || [];
+  var flags = opts.flags || {};
+  var ids = {};
+  var self = this;
+  var socket;
+
+  packet.nsp = this.nsp.name;
+  this.encoder.encode(packet, function(encodedPackets) {
+    if(self.rooms){
+      var room = self.rooms[packet.custom_room];
+      if(room){
+        if((room.indexOf(packet.custom_socket_id)) && (!ids[packet.custom_socket_id]) ){
+          socket = self.nsp.connected[packet.custom_socket_id];
+          if (socket) {
+            socket.packet(encodedPackets, true, flags.volatile);
+          }
+        }
+      }
+    } 
+    else {
+      console.log('No room exists - checking the ids individually');
+      if(self.sids.indexOf(packet.custom_socket_id)){
+        socket = self.nsp.connected[packet.custom_socket_id];
+        if (socket) socket.packet(encodedPackets, true, flags.volatile);
+      }
+    }
+  });
+};
+/**
  * Gets a list of clients by sid.
  *
  * @param {Array} explicit set of rooms to check.
