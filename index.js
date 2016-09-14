@@ -165,27 +165,34 @@ Adapter.prototype.broadcastId = function(packet, opts){
   var ids = {};
   var self = this;
   var socket;
-
+  var packetOpts = {
+    preEncoded: true,
+    volatile: flags.volatile,
+    compress: flags.compress
+  };
   packet.nsp = this.nsp.name;
   this.encoder.encode(packet, function(encodedPackets) {
     if(self.rooms){
       var room = self.rooms[packet.custom_room];
       if(room){
-        if((room.indexOf(packet.custom_socket_id)) && (!ids[packet.custom_socket_id]) ){
+        var sockets = room.sockets;
+        if((sockets.hasOwnProperty(packet.custom_socket_id)) && (!ids[packet.custom_socket_id]) ){
           socket = self.nsp.connected[packet.custom_socket_id];
           if (socket) {
-            socket.packet(encodedPackets, true, flags.volatile);
+           socket.packet(encodedPackets, packetOpts);
           }
         }
       }
     } 
     else {
-      console.log('No room exists - checking the ids individually');
-      if(self.sids.indexOf(packet.custom_socket_id)){
-        socket = self.nsp.connected[packet.custom_socket_id];
-        if (socket) socket.packet(encodedPackets, true, flags.volatile);
-      }
-    }
+     for (var id in self.sids) {
+       if (self.sids.hasOwnProperty(id)) {
+         if (~except.indexOf(id)) continue;
+         socket = self.nsp.connected[id];
+         if (socket) socket.packet(encodedPackets, packetOpts);
+       }
+     }
+    }  
   });
 };
 /**
